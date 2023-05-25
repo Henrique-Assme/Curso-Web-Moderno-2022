@@ -1,0 +1,1 @@
+console.log("Legal!"); /*continua sento uma unica sentença */
