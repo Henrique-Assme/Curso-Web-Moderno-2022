@@ -1,0 +1,7 @@
+const filhas = ['Ualeskah', 'Cibalena']
+const filhos = ['Uoxiton', 'Uesclei']
+
+const todos = filhas.concat(filhos, 'Fulano') //concatena e ainda adiciona
+console.log(todos, filhas, filhos)
+
+console.log(['a'].concat([1,2], [3,4], 5, [[6,7]])) // gera um novo array
