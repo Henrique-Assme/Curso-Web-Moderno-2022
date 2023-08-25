@@ -8,6 +8,7 @@ const initialState = {
     displayValue: '0',
     clearDisplay: false,
     operation: null,
+    lastOperation: null,
     values: [0,0],
     current: 0
 }
@@ -21,19 +22,32 @@ export default class Calculator extends React.Component {
         this.clearMemory = this.clearMemory.bind(this)
         this.setOperation = this.setOperation.bind(this)
         this.addDigit = this.addDigit.bind(this)
+        this.equalOperation = this.equalOperation.bind(this)
     }
 
     clearMemory() {
         this.setState({ ...initialState })
     }
 
-    setOperation(operation) {
-        if(this.state.current === 0 && this.state.operation !== '='){
-            this.setState({ operation, current: 1, clearDisplay: true})
+    equalOperation(equals){
+        if(this.state.lastOperation === '=' || this.state.lastOperation === null){
+            this.setOperation(this.state.operation)
+            this.setState({
+                lastOperation: equals,
+                clearDisplay: false,
+                current: 1
+            })
         } else {
-            const equals = operation === '='
+            this.setOperation(this.state.operation)
+        }
+    }
+
+    setOperation(operation) {
+        this.setState({ lastOperation: this.state.operation })
+        if (this.state.current === 0) {
+            this.setState({ operation, current: 1, clearDisplay: true })
+        } else {
             const currentOperation = this.state.operation
-            let zeroDivision = false
 
             const values = [...this.state.values]
             if(currentOperation === '/') {
@@ -46,14 +60,12 @@ export default class Calculator extends React.Component {
                 values[0] = values[0] + values[1]
             }
             this.setState({
-                displayValue: zeroDivision ? 'Err' : `${values[0]}`,
-                operation: equals ? currentOperation : operation,
-                current: equals ? 0 : 1,
+                operation: operation,
+                current: 1,
                 clearDisplay: true,
                 values
-             })
+            }, this.setState({ displayValue: `${values[0]}` }))
         }
-        console.log(this.state.operation)
     }
 
     addDigit(digit) {
@@ -61,19 +73,24 @@ export default class Calculator extends React.Component {
             return
         }
 
-        const clearDisplay = (this.state.displayValue === '0' && digit !== '.') || this.state.clearDisplay
+        const lastEquasl = this.state.lastOperation === '='
+        const clearDisplay = 
+            (this.state.displayValue === '0' && digit !== '.') 
+            || lastEquasl
+            || this.state.clearDisplay
         const currentValue = clearDisplay ? '' : this.state.displayValue
         const displayValue = currentValue + digit
         this.setState({ 
             displayValue: displayValue === '.' ? '0.' : displayValue, 
-            clearDisplay: false
+            clearDisplay: false,
+            current: lastEquasl ? 0 : this.state.current
+        }, () => {
+            const i = this.state.current
+            const newValue = parseFloat(displayValue)
+            const values = [...this.state.values]
+            values[i] = newValue
+            this.setState({ values })
         })
-
-        const i = this.state.current
-        const newValue = displayValue === '.' ? 0 : parseFloat(displayValue)
-        const values = [...this.state.values]
-        values[i] = newValue
-        this.setState({ values })
     }
 
     render(){
@@ -96,7 +113,7 @@ export default class Calculator extends React.Component {
                 <Button label="+" click={this.setOperation} operation/>
                 <Button label="0" click={this.addDigit} double/>
                 <Button label="." click={this.addDigit}/>
-                <Button label="=" click={this.setOperation} operation/>
+                <Button label="=" click={this.equalOperation} operation/>
             </div>
         )
     }
