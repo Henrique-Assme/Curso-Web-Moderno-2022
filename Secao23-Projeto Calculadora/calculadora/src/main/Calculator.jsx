@@ -35,11 +35,11 @@ export default class Calculator extends React.Component {
             this.setState({
                 lastOperation: equals,
                 clearDisplay: false,
-                current: 1
             })
         } else {
             this.setOperation(this.state.operation)
         }
+        this.setState({ current: 0 })
     }
 
     setOperation(operation) {
