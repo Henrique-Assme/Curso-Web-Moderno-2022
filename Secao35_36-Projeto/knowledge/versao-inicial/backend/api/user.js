@@ -9,7 +9,15 @@ module.exports = (app) => {
   };
 
   const save = async (req, res) => {
-    const user = { ...req.body };
+    const user = { 
+      id: req.body.id,
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      confirmPassword: req.body.confirmPassword,
+      admin: req.body.name
+     };
+    console.log(req.body.email)
     if (req.params.id) user.id = req.params.id;
 
     if(!req.originalUrl.startsWith('/users')) user.admin = false
@@ -18,7 +26,7 @@ module.exports = (app) => {
     try {
       existsOrError(user.name, "Nome não informado");
       existsOrError(user.email, "Email não informado");
-      existsOrError(user.password, "Senha não informado");
+      existsOrError(user.password, "Senha não informada");
       existsOrError(user.confirmPassword, "Confirmação da senha inválida");
       equalsOrError(user.password, user.confirmPassword, "Senhas não conferem");
 

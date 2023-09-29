@@ -1,5 +1,6 @@
 const admin = require("./admin");
 
+
 module.exports = (app) => {
   app.post("/signup", app.api.user.save);
   app.post("/signin", app.api.auth.signIn);
@@ -54,5 +55,7 @@ module.exports = (app) => {
     .all(app.config.passport.authenticate())
     .get(app.api.article.getByCategory);
 
-  app.route("/stats").get(app.api.stats.get);
+  app.route("/stats")
+    .all(app.config.passport.authenticate())  
+    .get(app.api.stats.get);
 };
